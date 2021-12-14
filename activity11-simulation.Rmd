@@ -26,6 +26,9 @@ One way to make sure that you get similar results each time is to always run all
 For this activity, you will need the `{tidyverse}`.
 
 **delete this line and load `{tidyverse}`**
+```{r, include=FALSE}
+library(tidyverse)
+```
 
 
 ## Exploration
