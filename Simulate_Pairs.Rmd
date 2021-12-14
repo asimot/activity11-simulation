@@ -1,0 +1,68 @@
+---
+title: "Random Sampling"
+author: "Aaron Simot"
+date: "12/14/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+library(tidyverse)
+
+```
+
+Define deck of cards
+```{r}
+# Define a standard deck of 52 playing cards
+# H = Hearts, D = Diamonds, S = Spades, C = Clubs
+# A 1 represents an Ace
+# A T represents the number 10, I want to gkeep everything two characters long
+deck <- c("1H", "2H", "3H", "4H", "5H", "6H", "7H", "8H", "9H", "TH", "JH", "QH", "KH",
+          "1D", "2D", "3D", "4D", "5D", "6D", "7D", "8D", "9D", "TD", "JD", "QD", "KD",
+          "1S", "2S", "3S", "4S", "5S", "6S", "7S", "8S", "9S", "TS", "JS", "QS", "KS",
+          "1C", "2C", "3C", "4C", "5C", "6C", "7C", "8C", "9C", "TC", "JC", "QC", "KC")
+
+```
+
+
+Probability of drawing a pair in standard deck : 0.05882353
+```{r}
+choose(n = 13, k = 2) / choose(n = 52, k = 2)
+
+```
+
+
+```{r}
+# Define a function that takes an input list of cards and outputs a 2 card sample
+pair_selector <- function(x) {
+  samp <- sample(x, 2, replace = FALSE) # Sample two cards from defined deck of 52 cards
+  samp <- str_c(samp[1], samp[2]) # Concatenate the string of 2 character cards
+}
+
+sampHands <- replicate(2000, pair_selector(deck)) # Map pair selector function 1000 times
+sampHands <- as_tibble(sampHands) # convert list to Tibble
+sampHands %>%
+  # Separate selected cards and the digits on each card
+  # Pair is binary, 1 = cards are a pair, 0 = they are not a pair
+  mutate(Card1 = str_sub(value, start = 1, end = 2),
+         Card2 = str_sub(value, start = 3, end = 4),
+         Digit1 = str_sub(Card1, start = 1, end = 1),
+         Digit2 = str_sub(Card2, start = 1, end = 1),
+         Pair = case_when(
+           Digit1 == Digit2 ~ 1,
+           TRUE ~ 0
+         )) %>%
+  summarise(probabilityPair = mean(Pair)) # Find probability on pairs in 1000 random draws
+
+```
+
+
+
+
+
+
+
