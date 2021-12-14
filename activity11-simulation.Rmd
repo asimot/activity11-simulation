@@ -62,19 +62,52 @@ ggplot(norm_samp_1000, aes(x = values)) +
 
 Using `norm_samp_1000`, obtain the mean and standard deviation of this sample?
 
+```{r}
+mean(norm_samp_1000$values)
+
+sd(norm_samp_1000$values)
+
+```
 
 
 Now, create a new simulation.
 In this you will obtain a sample of size 30 from from a Normally distributed variable with a mean 50 and standard deviation 10, and find the mean and standard deviation.
 How do the mean and standard deviation compare to your answers above?
 
+```{r}
+myNormSample <- as_tibble(
+  rnorm(n = 30, mean = 50, sd = 10)
+)
 
+mean(myNormSample$value)
+sd(myNormSample$value)
+
+```
+
+There is more variation in the mean and standard deviation from the input paramters in rnorm() than in the previous example with 1000 samples.
 
 ### Non-normally distributed population
 
 Using a similar process, obtain Exponentially distributed variable (`?rexp`) with a *rate* of 0.02.
 Obtain a sample of 1,000 observations and a sample of 30 observations.
 Then, calculate the mean and standard deviation of each sample and discuss how the values are similar and how they differ.
+
+```{r}
+myExpOne <- as_tibble(
+  rexp(n = 1000, rate = 0.02)
+)
+
+myExpTwo <- as_tibble(
+  rexp(n = 30, rate = 0.02)
+)
+
+mean(myExpOne$value)
+sd(myExpOne$value)
+
+mean(myExpTwo$value)
+sd(myExpTwo$value)
+
+```
 
 
 
@@ -95,7 +128,37 @@ This function should produce a dataset with `n` rows.
 You should **not** use the default parameter options for these distributions (e.g., your Normal data should not have a mean of 0 or a standard deviation of 1).
 Test your function with `n = 30` and `n = 1000`.
 
+```{r}
+generate_n_samples <- function(n) {
+  myGeneratedData <- tibble(
+    normDistr = rnorm(n, mean = 12, sd = 5),
+    expDistr = rexp(n, rate = 0.05),
+    chiDistr = rchisq(n, df = 20),
+    uniDistr = runif(n, min = 0, max = 15)
+  )
+}
 
+testSampOne <- generate_n_samples(30) %>% 
+                  summarise(normMean = mean(normDistr),
+                            expMean = mean(expDistr),
+                            chiMean = mean(chiDistr),
+                            uniMean = mean(uniDistr),
+                            normSD = sd(normDistr),
+                            expSD = sd(expDistr),
+                            chiSD = sd(chiDistr),
+                            uniSD = sd(uniDistr))
+
+
+testSampTwo <- generate_n_samples(1000)%>% 
+                  summarise(normMean = mean(normDistr),
+                            expMean = mean(expDistr),
+                            chiMean = mean(chiDistr),
+                            uniMean = mean(uniDistr),
+                            normSD = sd(normDistr),
+                            expSD = sd(expDistr),
+                            chiSD = sd(chiDistr),
+                            uniSD = sd(uniDistr))
+```
 
 
 Keep the following information in mind for the rest of this activity.
@@ -112,10 +175,10 @@ These are the "population values".
 
 | Distribution | Mean       | SD         |
 |--------------|------------|------------|
-| Normal       |            |            |
-| Exponential  |            |            |
-| Chi-square   |            |            |
-| Uniform      |            |            |
+| Normal       |      12    |      5     |
+| Exponential  |      20    |      20    |
+| Chi-square   |      20    |      40    |
+| Uniform      |      7.5   |      4.33  |
 
 
 Below I provide you with a function that calculates the sample mean for each column/distribution.
@@ -132,7 +195,13 @@ Then, use this function in addition to your multiple distribution sample generat
 Discuss how the means compares for each distribution.
 Note that it doesn't make sense to compare means/standard deviations across the distributions.
 
+```{r}
+myDistrib1 <- generate_n_samples(1000)
+myDistrib2 <- generate_n_samples(30)
 
+results1 <- sample_mean(myDistrib1)
+results2 <- sample_mean(myDistrib2)
+```
 
 
 ## Many samples
@@ -159,12 +228,19 @@ map(1:1000, ~rnorm(30, mean = 50, sd = 10))
 Continuing to work with your multiple distribution sample generator from above, generate 1,000 samples from the four distributions each with size 30.
 We will want to continue to work with this list so be sure to assign these samples to an appropriately named object (say, `multiple_samples`).
 
+```{r}
+multiple_samples <- replicate(1000, generate_n_samples(30), simplify = FALSE)
+
+```
 
 
 Calculate the sample mean of each sample using the appropriate `map` function and my `sample_mean` function to produce a *data frame* of multiple sample means from your multiple samples object.
 Assign these sample means to an appropriately named object.
 
+```{r}
+purrr::map(1:1000, ~sample_mean(multiple_samples))
 
+```
 
 
 
@@ -187,7 +263,9 @@ Note, looking at the wiki pages linked early in this activity will help you comp
 
 Using the restructured data, obtain the mean and standard deviation **for each** of the distributions.
 
+```{r}
 
+```
 
 
 Comment on how each mean compares to the "population values" mean that you calculated above.
